@@ -13,7 +13,10 @@ conn(); // database connection
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: "https://chat-app-clientside.vercel.app",
+  credentials: true, // if you plan to send cookies or auth headers
+}));
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
@@ -26,6 +29,7 @@ const server = http.createServer(app);
 // setup socket.io
 const io = new Server(server, {
   cors: { origin: "https://chat-app-clientside.vercel.app" },
+
 });
 
 // attach io to app so controllers can access it
