@@ -13,10 +13,22 @@ conn(); // database connection
 
 const app = express();
 
+// CORS setup
 app.use(cors({
   origin: "https://chat-app-clientside.vercel.app",
-  credentials: true, // if you plan to send cookies or auth headers
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // allow OPTIONS
+  allowedHeaders: ["Content-Type", "Authorization"],     // allow headers your frontend sends
 }));
+
+// Handle preflight requests manually (important on some platforms)
+app.options("*", cors({
+  origin: "https://chat-app-clientside.vercel.app",
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
