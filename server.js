@@ -14,11 +14,25 @@ conn(); // database connection
 const app = express();
 
 // CORS setup
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://chat-app-clientside.vercel.app"
+];
+
 app.use(cors({
-  origin: "https://chat-app-clientside.vercel.app",
+  origin: (origin, callback) => {
+    // allow REST tools / same-origin
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    callback(new Error("Not allowed by CORS"));
+  },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // allow OPTIONS
-  allowedHeaders: ["Content-Type", "Authorization"],     // allow headers your frontend sends
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 }));
 
 
@@ -35,8 +49,13 @@ const server = http.createServer(app);
 
 // setup socket.io
 const io = new Server(server, {
-  cors: { origin: "https://chat-app-clientside.vercel.app" },
+  cors: { 
+    origin: [ "http://localhost:5173","https://chat-app-clientside.vercel.app"],
+    methods: ["GET","POST","PUT"],
+    credentials: true 
 
+  },
+  transports: ["websocket"]
 });
 
 // attach io to app so controllers can access it
